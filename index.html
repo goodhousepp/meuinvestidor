@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <meta name="theme-color" content="#1877F2" />
-<title>Meu Investidor v1.32 PWA</title>
+<title>Meu Investidor v1.33 PWA</title>
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" href="icons/icon-192.png" sizes="192x192" />
 <link rel="apple-touch-icon" href="icons/icon-192.png" />
@@ -213,9 +213,7 @@ main,.view,.section,.card,.asset-list{min-width:0;max-width:100%}
 <p class="note">As chaves ficam somente neste navegador/aparelho. Não são enviadas para o Meu Investidor; são usadas diretamente nas APIs escolhidas.</p>
 <label>Chave API brapi.dev — ações e ETFs da B3</label><input id="brapiTokenInput" type="password" autocomplete="off" placeholder="Cole a chave API da brapi.dev">
 <div class="api-help note">No plano Gratuito, a brapi permite 1 ticker por requisição. Sem chave, apenas os tickers públicos de teste podem funcionar.</div>
-<label>API key Alpha Vantage — ações dos EUA</label><input id="alphaKeyInput" type="password" autocomplete="off" placeholder="Cole a API key da Alpha Vantage">
-<div class="api-help note">A cotação gratuita do endpoint GLOBAL_QUOTE é normalmente atualizada ao fim do pregão; dados em tempo real/delay exigem plano adequado do provedor.</div>
-<div class="api-help note" style="margin-top:12px"><strong>Japão — atualização automática</strong><br>Os ativos japoneses cadastrados na carteira são enviados automaticamente ao Worker do Meu Investidor. Não é necessário token nem cadastrar uma lista fixa de tickers.</div>
+<div class="api-help note" style="margin-top:12px"><strong>EUA e Japão — atualização automática</strong><br>Os ativos cadastrados nesses mercados são enviados automaticamente ao Worker do Meu Investidor. Não é necessário token nem cadastrar uma lista fixa de tickers.</div>
 <button class="btn" id="saveQuoteSettings" style="margin-top:14px">Salvar configuração</button>
 </div></div>
 <div class="modal" id="securityModal"><div class="sheet"><button class="close" data-close="securityModal">×</button><h3>Segurança do app</h3><p class="note">O PIN protege a abertura do aplicativo, mas não criptografa os dados armazenados no navegador.</p><div id="securitySetupFields"><label>Novo PIN de 6 dígitos</label><input id="securityPin" class="pin-input" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password" placeholder="••••••"><label>Confirmar PIN</label><input id="securityPinConfirm" class="pin-input" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password" placeholder="••••••"><label>Bloquear após inatividade</label><select id="securityTimeout"><option value="">Selecione o tempo</option><option value="1">1 minuto</option><option value="5">5 minutos</option><option value="15">15 minutos</option></select></div><div class="security-actions"><button class="btn" id="saveSecurity">Ativar / atualizar PIN</button><button class="btn secondary" id="lockNow" style="display:none">Bloquear agora</button><button class="btn danger" id="disableSecurity" style="display:none">Desativar bloqueio</button></div></div></div>
@@ -382,7 +380,6 @@ function renderQuoteStatus(){
 }
 function openQuoteSettings(){
   document.getElementById('brapiTokenInput').value=quoteConfig.brapiToken||'';
-  document.getElementById('alphaKeyInput').value=quoteConfig.alphaKey||'';
   document.getElementById('quoteSettingsModal').classList.add('open');
 }
 
@@ -451,34 +448,56 @@ async function updateCryptoQuotes(assets){
 }
 async function updateUsQuotes(assets){
   if(!assets.length)return{updated:0,failed:0,skipped:0,label:'0/0',errors:[]};
-  if(!quoteConfig.alphaKey)return{updated:0,failed:0,skipped:assets.length,label:'chave ausente',errors:[]};
-  let updated=0,failed=0;
-  const errors=[];
-  for(const a of assets){
-    try{
-      const url=`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${encodeURIComponent(a.ticker)}&apikey=${encodeURIComponent(quoteConfig.alphaKey)}`;
-      const res=await fetch(url,{cache:'no-store'});
-      if(!res.ok)throw new Error('HTTP '+res.status);
-      const data=await res.json();
-      if(data.Note){
-        failed++;errors.push(`${a.ticker}: limite/frequência da Alpha Vantage`);
-      }else if(data.Information){
-        failed++;errors.push(`${a.ticker}: ${data.Information}`);
-      }else if(data['Error Message']){
-        failed++;errors.push(`${a.ticker}: ticker/API inválido`);
-      }else{
-        const q=data['Global Quote']||{};
-        if(setQuoteOnAsset(a,q['05. price'],'Alpha Vantage'))updated++;
-        else{failed++;errors.push(`${a.ticker}: preço não retornado`);}
-      }
-    }catch(e){
-      failed++;errors.push(`${a.ticker}: ${e?.message||'falha na consulta'}`);
-    }
-    await new Promise(r=>setTimeout(r,500));
+
+  const normalized=assets.map(a=>({
+    asset:a,
+    ticker:String(a.ticker||'').trim().toUpperCase()
+  }));
+
+  const valid=normalized.filter(x=>x.ticker);
+  const invalid=normalized.filter(x=>!x.ticker);
+
+  let updated=0;
+  let failed=invalid.length;
+  const errors=invalid.map(()=> 'Ticker EUA vazio');
+
+  if(!valid.length){
+    return{updated,failed,skipped:0,label:`${updated}/${assets.length}`,errors};
   }
+
+  try{
+    const symbols=[...new Set(valid.map(x=>x.ticker))].join(',');
+    const url=`${QUOTE_WORKER_URL}?symbols=${encodeURIComponent(symbols)}&market=US`;
+    const res=await fetch(url,{cache:'no-store'});
+
+    if(!res.ok)throw new Error('HTTP '+res.status);
+
+    const data=await res.json();
+    if(!data?.ok||!data?.results||typeof data.results!=='object'){
+      throw new Error(data?.error||'resposta inválida do Worker');
+    }
+
+    for(const {asset,ticker} of valid){
+      const row=data.results[ticker];
+
+      if(row?.ok&&setQuoteOnAsset(asset,row.price,'Yahoo Finance via Worker')){
+        asset.quoteSymbol=row.symbol||ticker;
+        asset.quoteMarketDate=row.marketTime
+          ? new Date(Number(row.marketTime)*1000).toISOString()
+          : null;
+        updated++;
+      }else{
+        failed++;
+        errors.push(`${ticker}: ${row?.error||'preço não retornado'}`);
+      }
+    }
+  }catch(e){
+    failed+=valid.length;
+    errors.push(`Worker EUA: ${e?.message||'falha na consulta'}`);
+  }
+
   return{updated,failed,skipped:0,label:`${updated}/${assets.length}`,errors};
 }
-
 
 const QUOTE_WORKER_URL='https://soft-night-d5fc.shkhiro.workers.dev/';
 
@@ -659,15 +678,8 @@ async function refreshAssetQuotes(showAlert=true){
         msg+='\n\nJapão (Worker):\n'+jp.errors.slice(0,3).join('\n');
       }
 
-      if(!quoteConfig.alphaKey&&usa.length){
-        msg+='\n\nEUA (Alpha Vantage): chave API não configurada.';
-      }else if(us.errors?.length){
-        const alphaRateLimit=us.errors.some(e=>/limite|frequência|rate limit|premium/i.test(String(e)));
-        if(alphaRateLimit){
-          msg+='\n\nEUA (Alpha Vantage): limite/frequência da API atingido.';
-        }else{
-          msg+='\n\nEUA (Alpha Vantage):\n'+us.errors.slice(0,2).join('\n');
-        }
+      if(us.errors?.length){
+        msg+='\n\nEUA (Worker):\n'+us.errors.slice(0,3).join('\n');
       }
 
       if(br.errors?.length)msg+='\n\nB3:\n'+br.errors.slice(0,2).join('\n');
@@ -690,7 +702,6 @@ document.getElementById('quoteSettingsBtn').addEventListener('click',openQuoteSe
 document.getElementById('quoteSettingsBtn2').addEventListener('click',openQuoteSettings);
 document.getElementById('saveQuoteSettings').addEventListener('click',()=>{
   quoteConfig.brapiToken=document.getElementById('brapiTokenInput').value.trim();
-  quoteConfig.alphaKey=document.getElementById('alphaKeyInput').value.trim();
   saveQuoteConfig();
   document.getElementById('quoteSettingsModal').classList.remove('open');
   alert('Configuração de cotações salva.');
