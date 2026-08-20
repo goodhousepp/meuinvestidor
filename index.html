@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <meta name="theme-color" content="#1877F2" />
-<title>Meu Investidor v1.28 PWA</title>
+<title>Meu Investidor v1.29 PWA</title>
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" href="icons/icon-192.png" sizes="192x192" />
 <link rel="apple-touch-icon" href="icons/icon-192.png" />
@@ -425,7 +425,7 @@ function searchEodhd8035ByExchange(exchange){
 
 function searchAlpha8035(){
   const input=document.getElementById('alphaVantageKeyInput');
-  const apiKey=(quoteConfig.alphaVantageKey||input?.value||'').trim();
+  const apiKey=(quoteConfig.alphaKey||input?.value||'').trim();
   if(!apiKey){
     alert('Salve primeiro a API key da Alpha Vantage em Configurar APIs.');
     return;
