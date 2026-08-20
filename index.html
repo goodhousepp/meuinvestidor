@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <meta name="theme-color" content="#1877F2" />
-<title>Meu Investidor v1.27 PWA</title>
+<title>Meu Investidor v1.28 PWA</title>
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" href="icons/icon-192.png" sizes="192x192" />
 <link rel="apple-touch-icon" href="icons/icon-192.png" />
@@ -206,6 +206,7 @@ main,.view,.section,.card,.asset-list{min-width:0;max-width:100%}
   <button class="btn secondary" id="searchEodhd8035Btn" type="button">Buscar 8035 na EODHD</button>
   <button class="btn secondary" id="searchEodhd8035TOBtn" type="button">Buscar 8035 em TO</button>
   <button class="btn secondary" id="searchEodhd8035XTKSBtn" type="button">Buscar 8035 em XTKS</button>
+  <button class="btn secondary" id="searchAlpha8035Btn" type="button">Pesquisar 8035 na Alpha Vantage</button>
 </div>
 <div class="note" style="margin-top:8px">Diagnóstico somente leitura. Os testes abrem a EODHD em nova aba e não alteram nenhuma cotação da carteira. O token aparece somente na URL da aba de teste.</div>
 <button class="btn" id="saveQuoteSettings" style="margin-top:14px">Salvar configuração</button>
@@ -421,6 +422,25 @@ function searchEodhd8035ByExchange(exchange){
   );
 }
 
+
+function searchAlpha8035(){
+  const input=document.getElementById('alphaVantageKeyInput');
+  const apiKey=(quoteConfig.alphaVantageKey||input?.value||'').trim();
+  if(!apiKey){
+    alert('Salve primeiro a API key da Alpha Vantage em Configurar APIs.');
+    return;
+  }
+  const url=`https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=8035&apikey=${encodeURIComponent(apiKey)}`;
+  const a=document.createElement('a');
+  a.href=url;
+  a.target='_blank';
+  a.rel='noopener noreferrer';
+  a.style.display='none';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
 function cryptoIdForAsset(a){
   const t=String(a.ticker||'').toUpperCase();
   if(t.startsWith('BTC'))return'bitcoin';
@@ -618,6 +638,7 @@ document.getElementById('testEodhdXTKSBtn').addEventListener('click',()=>testEod
 document.getElementById('searchEodhd8035Btn').addEventListener('click',searchEodhd8035);
 document.getElementById('searchEodhd8035TOBtn').addEventListener('click',()=>searchEodhd8035ByExchange('TO'));
 document.getElementById('searchEodhd8035XTKSBtn').addEventListener('click',()=>searchEodhd8035ByExchange('XTKS'));
+document.getElementById('searchAlpha8035Btn').addEventListener('click',searchAlpha8035);
 document.getElementById('saveQuoteSettings').addEventListener('click',()=>{
   quoteConfig.brapiToken=document.getElementById('brapiTokenInput').value.trim();
   quoteConfig.alphaKey=document.getElementById('alphaKeyInput').value.trim();
