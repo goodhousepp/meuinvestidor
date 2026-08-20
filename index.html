@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <meta name="theme-color" content="#1877F2" />
-<title>Meu Investidor v1.31 PWA</title>
+<title>Meu Investidor v1.32 PWA</title>
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" href="icons/icon-192.png" sizes="192x192" />
 <link rel="apple-touch-icon" href="icons/icon-192.png" />
@@ -159,16 +159,27 @@ main,.view,.section,.card,.asset-list{min-width:0;max-width:100%}
 .quote-updated{font-size:11px;color:var(--muted);margin-top:5px}
 .api-help{padding:10px 12px;background:#f8fafc;border-radius:14px;margin-top:10px}
 @media(max-width:460px){.quote-summary{grid-template-columns:1fr}}
+
+.catalog-search-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}
+.catalog-search-row .btn{min-width:96px}
+.catalog-result{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:13px 0;border-bottom:1px solid var(--border)}
+.catalog-result:last-child{border-bottom:0}
+.catalog-result-name{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.catalog-result-meta{font-size:12px;color:var(--muted);margin-top:4px}
+.catalog-add{border:0;background:#eef4ff;color:var(--primary);font-weight:800;border-radius:12px;padding:9px 11px}
+.catalog-state{font-size:13px;color:var(--muted);padding:8px 0}
+@media(max-width:460px){.catalog-search-row{grid-template-columns:1fr}.catalog-search-row .btn{width:100%}}
+
 </style>
 </head>
 <body class="security-pending">
 <div class="app">
 <header class="hero"><div class="eyebrow">Carteira consolidada</div><h1>Meu Investidor</h1><div class="balance-label">Patrimônio estimado</div><div id="totalBalance" class="balance">¥ 0</div><div id="totalGain" class="gain">—</div><div class="hero-grid"><div class="hero-chip"><span>Renda projetada 4% a.a.</span><strong id="fourPercent">¥ 0/mês</strong></div><div class="hero-chip"><span>Ativos cadastrados</span><strong id="assetCount">0</strong></div></div></header>
 <main>
-<div class="quick"><button class="active" data-view="homeView">Resumo</button><button data-view="assetsView">Carteira</button><button data-view="incomeView">Dividendos</button><button data-view="goalView">Aposentadoria</button></div>
+<div class="quick"><button class="active" data-view="homeView">Resumo</button><button data-view="assetsView">Carteira</button><button data-view="catalogView">Catálogo</button><button data-view="incomeView">Dividendos</button><button data-view="goalView">Aposentadoria</button></div>
 <section id="homeView" class="view active">
 <div class="section"><div class="section-head"><h2>Câmbio</h2><button class="ghost" id="refreshFxBtn">Atualizar</button></div><div class="card"><div class="fx-strip"><div class="fx-box"><div class="meta">1 BRL</div><strong id="brlRateLabel">— JPY</strong></div><div class="fx-box"><div class="meta">1 USD</div><strong id="usdRateLabel">— JPY</strong></div></div><div class="meta" id="fxStatus" style="margin-top:10px">Câmbio ainda não atualizado.</div><button class="ghost" id="manualFxBtn" style="padding-left:0">Editar manualmente</button></div></div>
-<div class="section"><div class="section-head"><h2>Cotações dos ativos</h2><button class="ghost" id="quoteSettingsBtn">Configurar APIs</button></div><div class="card"><div class="quote-status"><span id="quoteDot" class="quote-dot"></span><strong id="quoteStatus">Ainda não atualizado</strong></div><div id="quoteDetail" class="meta" style="margin-top:6px">Atualiza B3, criptomoedas, ações dos EUA e ativos do Japão. EUA e Japão usam o Worker automático.</div><div class="quote-summary"><div><span class="meta">Atualizados</span><strong id="quoteUpdatedCount">0</strong></div><div><span class="meta">Ignorados</span><strong id="quoteSkippedCount">0</strong></div><div><span class="meta">Falhas</span><strong id="quoteFailedCount">0</strong></div></div><div class="quote-actions"><button class="btn" id="refreshQuotesBtn">↻ Atualizar cotações</button><button class="btn secondary" id="quoteSettingsBtn2">Configurar</button></div></div></div>
+<div class="section"><div class="section-head"><h2>Cotações dos ativos</h2><button class="ghost" id="quoteSettingsBtn">Configurar APIs</button></div><div class="card"><div class="quote-status"><span id="quoteDot" class="quote-dot"></span><strong id="quoteStatus">Ainda não atualizado</strong></div><div id="quoteDetail" class="meta" style="margin-top:6px">Atualiza B3, criptomoedas, ações dos EUA e ativos do Japão. Japão usa o Worker automático.</div><div class="quote-summary"><div><span class="meta">Atualizados</span><strong id="quoteUpdatedCount">0</strong></div><div><span class="meta">Ignorados</span><strong id="quoteSkippedCount">0</strong></div><div><span class="meta">Falhas</span><strong id="quoteFailedCount">0</strong></div></div><div class="quote-actions"><button class="btn" id="refreshQuotesBtn">↻ Atualizar cotações</button><button class="btn secondary" id="quoteSettingsBtn2">Configurar</button></div></div></div>
 <div class="section"><div class="section-head"><h2>Distribuição da carteira</h2></div><div class="card"><div class="pie-wrap"><div id="marketPie" class="pie"></div><div id="marketLegend" class="legend"></div></div></div><div id="countryGrid" class="country-grid" style="margin-top:10px"></div></div><div class="section"><div class="section-head"><h2>Carteira por tipo de ativo</h2></div><div id="typeSummary"></div></div><div class="section"><div class="section-head"><h2>Evolução do patrimônio</h2></div><div class="card"><div id="historyChart" class="history-chart"></div><div id="historyNote" class="chart-note">O histórico começa a ser registrado quando houver patrimônio calculado.</div></div></div>
 <div class="section"><div class="section-head"><h2>Carteira por local de investimento</h2></div><div id="accountSummary"></div></div>
 <div class="section"><div class="section-head"><h2>Maiores posições</h2><button class="ghost" data-open="assetModal">Adicionar</button></div><div class="card" id="topAssets"></div></div>
@@ -183,6 +194,12 @@ main,.view,.section,.card,.asset-list{min-width:0;max-width:100%}
 <div class="section"><div class="section-head"><h2>Meta de aposentadoria</h2><button class="ghost" data-view-target="goalView">Editar</button></div><div class="card"><div class="goal-row"><div><div class="meta">Patrimônio atual</div><strong id="goalCurrent">¥ 0</strong></div><div><div class="meta">Meta</div><strong id="goalTarget">¥ 0</strong></div></div><div class="progress"><i id="goalProgress"></i></div><div class="meta" id="goalPercent" style="margin-top:8px">0% da meta</div></div></div>
 </section>
 <section id="assetsView" class="view"><div class="section"><div class="section-head"><h2>Carteira</h2><button class="ghost" data-open="assetModal">+ Ativo</button></div><div class="card"><div class="meta" style="margin-bottom:4px">Valores nas moedas originais</div><div class="note" style="margin-bottom:8px">O desempenho desta tela não usa conversão cambial.</div><div id="assetCurrencySummary" class="native-summary"></div></div><div class="section-head" style="margin-top:14px"><h2 style="font-size:16px">Ativos por local de investimento</h2></div><div id="assetCards"></div></div></section>
+<section id="catalogView" class="view"><div class="section"><div class="section-head"><h2>Catálogo de ações</h2></div><div class="card">
+<p class="note">Pesquise por nome ou ticker. O catálogo consulta Brasil, Japão e EUA, mas somente os ativos adicionados à sua carteira entram na atualização de cotações.</p>
+<div class="form-grid"><div><label>Mercado</label><select id="catalogMarket"><option value="BR">Brasil</option><option value="JP">Japão</option><option value="US">EUA</option></select></div><div><label>Busca</label><input id="catalogQuery" placeholder="Ex.: Petrobras, Toyota, Apple"></div></div>
+<div class="catalog-search-row" style="margin-top:10px"><div class="note" id="catalogHint">Digite pelo menos 2 caracteres.</div><button class="btn" id="catalogSearchBtn" type="button">Pesquisar</button></div>
+<div id="catalogResults" style="margin-top:12px"><div class="catalog-state">Nenhuma pesquisa realizada.</div></div>
+</div></div></section>
 <section id="incomeView" class="view"><div class="section"><div class="section-head"><h2>Dividendos</h2><button class="ghost" data-open="dividendModal">+ Registrar</button></div><div class="card"><div class="goal-row"><div><div class="meta">Total registrado</div><strong id="dividendTotal">¥ 0</strong></div><div><div class="meta">Últimos 12 meses</div><strong id="dividend12">¥ 0</strong></div></div></div><div class="card" style="margin-top:10px"><div class="section-head"><h2 style="font-size:16px">Distribuição por ativo</h2></div><div class="pie-wrap"><div id="dividendPie" class="pie"></div><div id="dividendLegend" class="legend"></div></div></div><div class="card" style="margin-top:10px"><div class="section-head"><h2 style="font-size:16px">Proventos por mês</h2><strong id="dividendMonthlyYear" class="meta"></strong></div><div class="monthly-dividend-wrap"><div id="dividendMonthlyChart" class="monthly-dividend-chart"></div></div><div id="dividendMonthlyTotal" class="monthly-dividend-total"></div></div><div class="card" style="margin-top:10px"><div id="dividendList"></div></div></div></section>
 <section id="goalView" class="view"><div class="section"><div class="section-head"><h2>Projeção de aposentadoria</h2></div><div class="card"><div class="form-grid"><div><label>Meta patrimonial (¥)</label><input id="targetInput" type="number" min="0" step="10000"></div><div><label>Prazo (anos)</label><input id="yearsInput" type="number" min="1" max="60"></div></div><div class="form-grid"><div><label>Aporte anual (¥)</label><input id="annualInput" type="number" min="0" step="10000"></div><div><label>Retorno anual estimado (%)</label><input id="returnInput" type="number" min="-50" max="50" step="0.1"></div></div><button class="btn" id="saveGoal" style="margin-top:14px">Salvar projeção</button></div><div class="card" style="margin-top:10px"><div class="meta">Patrimônio projetado</div><div style="font-size:30px;font-weight:800;margin-top:4px" id="projectedValue">¥ 0</div><div class="meta" style="margin-top:14px">Renda mensal pela regra dos 4%</div><div style="font-size:22px;font-weight:800;margin-top:4px" id="projectedIncome">¥ 0</div><p class="note">A projeção é uma simulação matemática, não uma promessa de rentabilidade.</p></div></div></section>
 </main></div>
@@ -196,7 +213,9 @@ main,.view,.section,.card,.asset-list{min-width:0;max-width:100%}
 <p class="note">As chaves ficam somente neste navegador/aparelho. Não são enviadas para o Meu Investidor; são usadas diretamente nas APIs escolhidas.</p>
 <label>Chave API brapi.dev — ações e ETFs da B3</label><input id="brapiTokenInput" type="password" autocomplete="off" placeholder="Cole a chave API da brapi.dev">
 <div class="api-help note">No plano Gratuito, a brapi permite 1 ticker por requisição. Sem chave, apenas os tickers públicos de teste podem funcionar.</div>
-<div class="api-help note" style="margin-top:12px"><strong>EUA e Japão — atualização automática</strong><br>Os ativos cadastrados nesses mercados são enviados automaticamente ao Worker do Meu Investidor. Não é necessário token nem cadastrar uma lista fixa de tickers.</div>
+<label>API key Alpha Vantage — ações dos EUA</label><input id="alphaKeyInput" type="password" autocomplete="off" placeholder="Cole a API key da Alpha Vantage">
+<div class="api-help note">A cotação gratuita do endpoint GLOBAL_QUOTE é normalmente atualizada ao fim do pregão; dados em tempo real/delay exigem plano adequado do provedor.</div>
+<div class="api-help note" style="margin-top:12px"><strong>Japão — atualização automática</strong><br>Os ativos japoneses cadastrados na carteira são enviados automaticamente ao Worker do Meu Investidor. Não é necessário token nem cadastrar uma lista fixa de tickers.</div>
 <button class="btn" id="saveQuoteSettings" style="margin-top:14px">Salvar configuração</button>
 </div></div>
 <div class="modal" id="securityModal"><div class="sheet"><button class="close" data-close="securityModal">×</button><h3>Segurança do app</h3><p class="note">O PIN protege a abertura do aplicativo, mas não criptografa os dados armazenados no navegador.</p><div id="securitySetupFields"><label>Novo PIN de 6 dígitos</label><input id="securityPin" class="pin-input" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password" placeholder="••••••"><label>Confirmar PIN</label><input id="securityPinConfirm" class="pin-input" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password" placeholder="••••••"><label>Bloquear após inatividade</label><select id="securityTimeout"><option value="">Selecione o tempo</option><option value="1">1 minuto</option><option value="5">5 minutos</option><option value="15">15 minutos</option></select></div><div class="security-actions"><button class="btn" id="saveSecurity">Ativar / atualizar PIN</button><button class="btn secondary" id="lockNow" style="display:none">Bloquear agora</button><button class="btn danger" id="disableSecurity" style="display:none">Desativar bloqueio</button></div></div></div>
@@ -359,10 +378,11 @@ function renderQuoteStatus(){
     if(r.usa!==undefined)parts.push(`EUA ${r.usa}`);
     if(r.japan!==undefined)parts.push(`Japão ${r.japan}`);
     detail.textContent=parts.length?parts.join(' · '):'Cotações processadas.';
-  } else detail.textContent='Atualiza B3 e criptomoedas diretamente; EUA e Japão via Worker.';
+  } else detail.textContent='Atualiza B3, criptomoedas, ações dos EUA e ativos do Japão via Worker.';
 }
 function openQuoteSettings(){
   document.getElementById('brapiTokenInput').value=quoteConfig.brapiToken||'';
+  document.getElementById('alphaKeyInput').value=quoteConfig.alphaKey||'';
   document.getElementById('quoteSettingsModal').classList.add('open');
 }
 
@@ -429,60 +449,38 @@ async function updateCryptoQuotes(assets){
     return{updated,failed,skipped,label:`${updated}/${assets.length}`};
   }catch(e){return{updated:0,failed:supported.length,skipped,label:`0/${assets.length}`}}
 }
-const QUOTE_WORKER_URL='https://soft-night-d5fc.shkhiro.workers.dev/';
-
 async function updateUsQuotes(assets){
   if(!assets.length)return{updated:0,failed:0,skipped:0,label:'0/0',errors:[]};
-
-  const normalized=assets.map(a=>({
-    asset:a,
-    ticker:String(a.ticker||'').trim().toUpperCase()
-  }));
-
-  const valid=normalized.filter(x=>x.ticker);
-  const invalid=normalized.filter(x=>!x.ticker);
-
-  let updated=0;
-  let failed=invalid.length;
-  const errors=invalid.map(()=> 'Ticker EUA vazio');
-
-  if(!valid.length){
-    return{updated,failed,skipped:0,label:`${updated}/${assets.length}`,errors};
-  }
-
-  try{
-    const symbols=[...new Set(valid.map(x=>x.ticker))].join(',');
-    const url=`${QUOTE_WORKER_URL}?symbols=${encodeURIComponent(symbols)}&market=US`;
-    const res=await fetch(url,{cache:'no-store'});
-
-    if(!res.ok)throw new Error('HTTP '+res.status);
-
-    const data=await res.json();
-    if(!data?.ok||!data?.results||typeof data.results!=='object'){
-      throw new Error(data?.error||'resposta inválida do Worker');
-    }
-
-    for(const {asset,ticker} of valid){
-      const row=data.results[ticker];
-
-      if(row?.ok&&setQuoteOnAsset(asset,row.price,'Yahoo Finance via Worker')){
-        asset.quoteSymbol=row.symbol||ticker;
-        asset.quoteMarketDate=row.marketTime
-          ? new Date(Number(row.marketTime)*1000).toISOString()
-          : null;
-        updated++;
+  if(!quoteConfig.alphaKey)return{updated:0,failed:0,skipped:assets.length,label:'chave ausente',errors:[]};
+  let updated=0,failed=0;
+  const errors=[];
+  for(const a of assets){
+    try{
+      const url=`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${encodeURIComponent(a.ticker)}&apikey=${encodeURIComponent(quoteConfig.alphaKey)}`;
+      const res=await fetch(url,{cache:'no-store'});
+      if(!res.ok)throw new Error('HTTP '+res.status);
+      const data=await res.json();
+      if(data.Note){
+        failed++;errors.push(`${a.ticker}: limite/frequência da Alpha Vantage`);
+      }else if(data.Information){
+        failed++;errors.push(`${a.ticker}: ${data.Information}`);
+      }else if(data['Error Message']){
+        failed++;errors.push(`${a.ticker}: ticker/API inválido`);
       }else{
-        failed++;
-        errors.push(`${ticker}: ${row?.error||'preço não retornado'}`);
+        const q=data['Global Quote']||{};
+        if(setQuoteOnAsset(a,q['05. price'],'Alpha Vantage'))updated++;
+        else{failed++;errors.push(`${a.ticker}: preço não retornado`);}
       }
+    }catch(e){
+      failed++;errors.push(`${a.ticker}: ${e?.message||'falha na consulta'}`);
     }
-  }catch(e){
-    failed+=valid.length;
-    errors.push(`Worker EUA: ${e?.message||'falha na consulta'}`);
+    await new Promise(r=>setTimeout(r,500));
   }
-
   return{updated,failed,skipped:0,label:`${updated}/${assets.length}`,errors};
 }
+
+
+const QUOTE_WORKER_URL='https://soft-night-d5fc.shkhiro.workers.dev/';
 
 async function updateJapanQuotes(assets){
   if(!assets.length)return{updated:0,failed:0,skipped:0,label:'0/0',errors:[]};
@@ -541,6 +539,87 @@ async function updateJapanQuotes(assets){
 
   return{updated,failed,skipped:0,label:`${updated}/${assets.length}`,errors};
 }
+
+function catalogMarketInfo(code){
+  if(code==='BR')return{market:'Brasil',currency:'BRL'};
+  if(code==='JP')return{market:'Japão',currency:'JPY'};
+  return{market:'EUA',currency:'USD'};
+}
+
+function normalizeCatalogTicker(symbol,marketCode){
+  let t=String(symbol||'').trim().toUpperCase();
+  if(marketCode==='BR')t=t.replace(/\.SA$/,'');
+  if(marketCode==='JP')t=t.replace(/\.T$/,'');
+  return t;
+}
+
+function addCatalogAsset(index){
+  const rows=window.__catalogRows||[];
+  const row=rows[index];
+  if(!row)return;
+  const info=catalogMarketInfo(row.marketCode);
+  const ticker=normalizeCatalogTicker(row.symbol,row.marketCode);
+  const duplicate=state.assets.some(a=>String(a.ticker||'').toUpperCase()===ticker && a.market===info.market);
+  if(duplicate){
+    alert(`${ticker} já está na carteira.`);
+    return;
+  }
+  document.getElementById('assetModalTitle').textContent='Adicionar ativo';
+  document.getElementById('editAssetIndex').value='';
+  document.getElementById('tickerInput').value=ticker;
+  document.getElementById('nameInput').value=row.name||ticker;
+  document.getElementById('marketInput').value=info.market;
+  document.getElementById('currencyInput').value=info.currency;
+  document.getElementById('accountInput').value=info.market==='Brasil'?'Nubank':'Rakuten Securities';
+  document.getElementById('qtyInput').value='';
+  document.getElementById('avgPriceInput').value='';
+  document.getElementById('priceInput').value='';
+  document.getElementById('deleteAsset').style.display='none';
+  document.getElementById('assetModal').classList.add('open');
+  updatePreview();
+}
+
+async function searchCatalog(){
+  const marketCode=document.getElementById('catalogMarket').value;
+  const query=document.getElementById('catalogQuery').value.trim();
+  const resultsEl=document.getElementById('catalogResults');
+  const hint=document.getElementById('catalogHint');
+  if(query.length<2){
+    hint.textContent='Digite pelo menos 2 caracteres.';
+    resultsEl.innerHTML='<div class="catalog-state">Busca muito curta.</div>';
+    return;
+  }
+  const btn=document.getElementById('catalogSearchBtn');
+  btn.disabled=true;btn.textContent='Buscando…';
+  hint.textContent='Consultando catálogo...';
+  resultsEl.innerHTML='<div class="catalog-state">Buscando ativos…</div>';
+  try{
+    const url=`${QUOTE_WORKER_URL}?action=search&query=${encodeURIComponent(query)}&market=${encodeURIComponent(marketCode)}`;
+    const res=await fetch(url,{cache:'no-store'});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    if(!data?.ok||!Array.isArray(data.results))throw new Error(data?.error||'resposta inválida do Worker');
+    const rows=data.results.map(x=>({...x,marketCode}));
+    window.__catalogRows=rows;
+    hint.textContent=`${rows.length} resultado${rows.length===1?'':'s'} encontrado${rows.length===1?'':'s'}.`;
+    if(!rows.length){
+      resultsEl.innerHTML='<div class="catalog-state">Nenhum ativo encontrado nesse mercado.</div>';
+      return;
+    }
+    resultsEl.innerHTML=rows.map((r,i)=>{
+      const ticker=normalizeCatalogTicker(r.symbol,marketCode);
+      const info=catalogMarketInfo(marketCode);
+      return `<div class="catalog-result"><div><div class="catalog-result-name">${r.name||ticker}</div><div class="catalog-result-meta">${ticker} · ${info.market}${r.exchange?' · '+r.exchange:''}${r.type?' · '+r.type:''}</div></div><button class="catalog-add" type="button" onclick="addCatalogAsset(${i})">Adicionar</button></div>`;
+    }).join('');
+  }catch(e){
+    hint.textContent='Falha na pesquisa.';
+    resultsEl.innerHTML=`<div class="catalog-state">Não foi possível consultar o catálogo: ${String(e?.message||e)}</div>`;
+  }finally{
+    btn.disabled=false;btn.textContent='Pesquisar';
+  }
+}
+window.addCatalogAsset=addCatalogAsset;
+
 async function refreshAssetQuotes(showAlert=true){
   const btn=document.getElementById('refreshQuotesBtn');
   btn.disabled=true;btn.textContent='Atualizando…';
@@ -580,8 +659,15 @@ async function refreshAssetQuotes(showAlert=true){
         msg+='\n\nJapão (Worker):\n'+jp.errors.slice(0,3).join('\n');
       }
 
-      if(us.errors?.length){
-        msg+='\n\nEUA (Worker):\n'+us.errors.slice(0,3).join('\n');
+      if(!quoteConfig.alphaKey&&usa.length){
+        msg+='\n\nEUA (Alpha Vantage): chave API não configurada.';
+      }else if(us.errors?.length){
+        const alphaRateLimit=us.errors.some(e=>/limite|frequência|rate limit|premium/i.test(String(e)));
+        if(alphaRateLimit){
+          msg+='\n\nEUA (Alpha Vantage): limite/frequência da API atingido.';
+        }else{
+          msg+='\n\nEUA (Alpha Vantage):\n'+us.errors.slice(0,2).join('\n');
+        }
       }
 
       if(br.errors?.length)msg+='\n\nB3:\n'+br.errors.slice(0,2).join('\n');
@@ -604,10 +690,13 @@ document.getElementById('quoteSettingsBtn').addEventListener('click',openQuoteSe
 document.getElementById('quoteSettingsBtn2').addEventListener('click',openQuoteSettings);
 document.getElementById('saveQuoteSettings').addEventListener('click',()=>{
   quoteConfig.brapiToken=document.getElementById('brapiTokenInput').value.trim();
+  quoteConfig.alphaKey=document.getElementById('alphaKeyInput').value.trim();
   saveQuoteConfig();
   document.getElementById('quoteSettingsModal').classList.remove('open');
   alert('Configuração de cotações salva.');
 });
+document.getElementById('catalogSearchBtn').addEventListener('click',searchCatalog);
+document.getElementById('catalogQuery').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();searchCatalog();}});
 document.getElementById('refreshQuotesBtn').addEventListener('click',()=>refreshAssetQuotes(true));
 document.getElementById('refreshFxBtn').addEventListener('click',()=>refreshFx(true));
 document.getElementById('divTicker').addEventListener('change',updateDividendAssetSelection);
