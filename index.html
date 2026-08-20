@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <meta name="theme-color" content="#1877F2" />
-<title>Meu Investidor v1.29 PWA</title>
+<title>Meu Investidor v1.30 PWA</title>
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" href="icons/icon-192.png" sizes="192x192" />
 <link rel="apple-touch-icon" href="icons/icon-192.png" />
@@ -168,7 +168,7 @@ main,.view,.section,.card,.asset-list{min-width:0;max-width:100%}
 <div class="quick"><button class="active" data-view="homeView">Resumo</button><button data-view="assetsView">Carteira</button><button data-view="incomeView">Dividendos</button><button data-view="goalView">Aposentadoria</button></div>
 <section id="homeView" class="view active">
 <div class="section"><div class="section-head"><h2>Câmbio</h2><button class="ghost" id="refreshFxBtn">Atualizar</button></div><div class="card"><div class="fx-strip"><div class="fx-box"><div class="meta">1 BRL</div><strong id="brlRateLabel">— JPY</strong></div><div class="fx-box"><div class="meta">1 USD</div><strong id="usdRateLabel">— JPY</strong></div></div><div class="meta" id="fxStatus" style="margin-top:10px">Câmbio ainda não atualizado.</div><button class="ghost" id="manualFxBtn" style="padding-left:0">Editar manualmente</button></div></div>
-<div class="section"><div class="section-head"><h2>Cotações dos ativos</h2><button class="ghost" id="quoteSettingsBtn">Configurar APIs</button></div><div class="card"><div class="quote-status"><span id="quoteDot" class="quote-dot"></span><strong id="quoteStatus">Ainda não atualizado</strong></div><div id="quoteDetail" class="meta" style="margin-top:6px">Atualiza B3, criptomoedas e ações dos EUA. Japão é atualizado via EODHD após configurar o token.</div><div class="quote-summary"><div><span class="meta">Atualizados</span><strong id="quoteUpdatedCount">0</strong></div><div><span class="meta">Ignorados</span><strong id="quoteSkippedCount">0</strong></div><div><span class="meta">Falhas</span><strong id="quoteFailedCount">0</strong></div></div><div class="quote-actions"><button class="btn" id="refreshQuotesBtn">↻ Atualizar cotações</button><button class="btn secondary" id="quoteSettingsBtn2">Configurar</button></div></div></div>
+<div class="section"><div class="section-head"><h2>Cotações dos ativos</h2><button class="ghost" id="quoteSettingsBtn">Configurar APIs</button></div><div class="card"><div class="quote-status"><span id="quoteDot" class="quote-dot"></span><strong id="quoteStatus">Ainda não atualizado</strong></div><div id="quoteDetail" class="meta" style="margin-top:6px">Atualiza B3, criptomoedas, ações dos EUA e ativos do Japão. Japão usa o Worker automático.</div><div class="quote-summary"><div><span class="meta">Atualizados</span><strong id="quoteUpdatedCount">0</strong></div><div><span class="meta">Ignorados</span><strong id="quoteSkippedCount">0</strong></div><div><span class="meta">Falhas</span><strong id="quoteFailedCount">0</strong></div></div><div class="quote-actions"><button class="btn" id="refreshQuotesBtn">↻ Atualizar cotações</button><button class="btn secondary" id="quoteSettingsBtn2">Configurar</button></div></div></div>
 <div class="section"><div class="section-head"><h2>Distribuição da carteira</h2></div><div class="card"><div class="pie-wrap"><div id="marketPie" class="pie"></div><div id="marketLegend" class="legend"></div></div></div><div id="countryGrid" class="country-grid" style="margin-top:10px"></div></div><div class="section"><div class="section-head"><h2>Carteira por tipo de ativo</h2></div><div id="typeSummary"></div></div><div class="section"><div class="section-head"><h2>Evolução do patrimônio</h2></div><div class="card"><div id="historyChart" class="history-chart"></div><div id="historyNote" class="chart-note">O histórico começa a ser registrado quando houver patrimônio calculado.</div></div></div>
 <div class="section"><div class="section-head"><h2>Carteira por local de investimento</h2></div><div id="accountSummary"></div></div>
 <div class="section"><div class="section-head"><h2>Maiores posições</h2><button class="ghost" data-open="assetModal">Adicionar</button></div><div class="card" id="topAssets"></div></div>
@@ -198,17 +198,7 @@ main,.view,.section,.card,.asset-list{min-width:0;max-width:100%}
 <div class="api-help note">No plano Gratuito, a brapi permite 1 ticker por requisição. Sem chave, apenas os tickers públicos de teste podem funcionar.</div>
 <label>API key Alpha Vantage — ações dos EUA</label><input id="alphaKeyInput" type="password" autocomplete="off" placeholder="Cole a API key da Alpha Vantage">
 <div class="api-help note">A cotação gratuita do endpoint GLOBAL_QUOTE é normalmente atualizada ao fim do pregão; dados em tempo real/delay exigem plano adequado do provedor.</div>
-<label>API token EODHD — ativos do Japão</label><input id="eodhdTokenInput" type="password" autocomplete="off" placeholder="Cole o token da EODHD">
-<div class="api-help note">Os tickers japoneses cadastrados como 8035, 6857, 8316 etc. são consultados automaticamente na bolsa de Tóquio. Configure o token uma única vez; ao adicionar novos ativos japoneses, não é necessário alterar o app.</div>
-<div class="quote-actions" style="display:grid;gap:8px">
-  <button class="btn secondary" id="testEodhdTOBtn" type="button">Testar 8035.TO</button>
-  <button class="btn secondary" id="testEodhdXTKSBtn" type="button">Testar 8035.XTKS</button>
-  <button class="btn secondary" id="searchEodhd8035Btn" type="button">Buscar 8035 na EODHD</button>
-  <button class="btn secondary" id="searchEodhd8035TOBtn" type="button">Buscar 8035 em TO</button>
-  <button class="btn secondary" id="searchEodhd8035XTKSBtn" type="button">Buscar 8035 em XTKS</button>
-  <button class="btn secondary" id="searchAlpha8035Btn" type="button">Pesquisar 8035 na Alpha Vantage</button>
-</div>
-<div class="note" style="margin-top:8px">Diagnóstico somente leitura. Os testes abrem a EODHD em nova aba e não alteram nenhuma cotação da carteira. O token aparece somente na URL da aba de teste.</div>
+<div class="api-help note" style="margin-top:12px"><strong>Japão — atualização automática</strong><br>Os ativos japoneses cadastrados na carteira são enviados automaticamente ao Worker do Meu Investidor. Não é necessário token nem cadastrar uma lista fixa de tickers.</div>
 <button class="btn" id="saveQuoteSettings" style="margin-top:14px">Salvar configuração</button>
 </div></div>
 <div class="modal" id="securityModal"><div class="sheet"><button class="close" data-close="securityModal">×</button><h3>Segurança do app</h3><p class="note">O PIN protege a abertura do aplicativo, mas não criptografa os dados armazenados no navegador.</p><div id="securitySetupFields"><label>Novo PIN de 6 dígitos</label><input id="securityPin" class="pin-input" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password" placeholder="••••••"><label>Confirmar PIN</label><input id="securityPinConfirm" class="pin-input" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password" placeholder="••••••"><label>Bloquear após inatividade</label><select id="securityTimeout"><option value="">Selecione o tempo</option><option value="1">1 minuto</option><option value="5">5 minutos</option><option value="15">15 minutos</option></select></div><div class="security-actions"><button class="btn" id="saveSecurity">Ativar / atualizar PIN</button><button class="btn secondary" id="lockNow" style="display:none">Bloquear agora</button><button class="btn danger" id="disableSecurity" style="display:none">Desativar bloqueio</button></div></div></div>
@@ -371,75 +361,14 @@ function renderQuoteStatus(){
     if(r.usa!==undefined)parts.push(`EUA ${r.usa}`);
     if(r.japan!==undefined)parts.push(`Japão ${r.japan}`);
     detail.textContent=parts.length?parts.join(' · '):'Cotações processadas.';
-  } else detail.textContent='Atualiza B3, criptomoedas, ações dos EUA e ativos do Japão via EODHD.';
+  } else detail.textContent='Atualiza B3, criptomoedas, ações dos EUA e ativos do Japão via Worker.';
 }
 function openQuoteSettings(){
   document.getElementById('brapiTokenInput').value=quoteConfig.brapiToken||'';
   document.getElementById('alphaKeyInput').value=quoteConfig.alphaKey||'';
-  document.getElementById('eodhdTokenInput').value=quoteConfig.eodhdToken||'';
   document.getElementById('quoteSettingsModal').classList.add('open');
 }
 
-
-function getSavedEodhdToken(){
-  const input=document.getElementById('eodhdTokenInput');
-  return (quoteConfig.eodhdToken||input?.value||'').trim();
-}
-
-function openEodhdDiagnosticUrl(urlBuilder){
-  const token=getSavedEodhdToken();
-  if(!token){
-    alert('Salve primeiro o token EODHD em Configurar APIs.');
-    return;
-  }
-
-  const url=urlBuilder(token);
-  const a=document.createElement('a');
-  a.href=url;
-  a.target='_blank';
-  a.rel='noopener noreferrer';
-  a.style.display='none';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-}
-
-function testEodhdSymbol(symbol){
-  openEodhdDiagnosticUrl((token)=>
-    `https://eodhd.com/api/eod/${encodeURIComponent(symbol)}?api_token=${encodeURIComponent(token)}&fmt=json&period=d&order=d&limit=1`
-  );
-}
-
-function searchEodhd8035(){
-  openEodhdDiagnosticUrl((token)=>
-    `https://eodhd.com/api/search/8035?api_token=${encodeURIComponent(token)}&fmt=json`
-  );
-}
-
-function searchEodhd8035ByExchange(exchange){
-  openEodhdDiagnosticUrl((token)=>
-    `https://eodhd.com/api/search/8035?api_token=${encodeURIComponent(token)}&fmt=json&exchange=${encodeURIComponent(exchange)}`
-  );
-}
-
-
-function searchAlpha8035(){
-  const input=document.getElementById('alphaVantageKeyInput');
-  const apiKey=(quoteConfig.alphaKey||input?.value||'').trim();
-  if(!apiKey){
-    alert('Salve primeiro a API key da Alpha Vantage em Configurar APIs.');
-    return;
-  }
-  const url=`https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=8035&apikey=${encodeURIComponent(apiKey)}`;
-  const a=document.createElement('a');
-  a.href=url;
-  a.target='_blank';
-  a.rel='noopener noreferrer';
-  a.style.display='none';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-}
 
 function cryptoIdForAsset(a){
   const t=String(a.ticker||'').toUpperCase();
@@ -534,35 +463,63 @@ async function updateUsQuotes(assets){
 }
 
 
+const JAPAN_WORKER_URL='https://soft-night-d5fc.shkhiro.workers.dev/';
+
 async function updateJapanQuotes(assets){
   if(!assets.length)return{updated:0,failed:0,skipped:0,label:'0/0',errors:[]};
-  if(!quoteConfig.eodhdToken)return{updated:0,failed:0,skipped:assets.length,label:'token ausente',errors:[]};
-  let updated=0,failed=0;
-  const errors=[];
-  for(const a of assets){
-    const localTicker=String(a.ticker||'').trim().toUpperCase().replace(/\.T$/,'').replace(/\.TO$/,'');
-    if(!localTicker){failed++;errors.push('Ticker japonês vazio');continue;}
-    // EODHD usa o código de exchange XTKS para Tóquio. O ticker fica dinâmico: nenhum ativo precisa ser cadastrado no código.
-    const eodSymbol=`${localTicker}.XTKS`;
-    try{
-      const url=`https://eodhd.com/api/eod/${encodeURIComponent(eodSymbol)}?api_token=${encodeURIComponent(quoteConfig.eodhdToken)}&fmt=json&period=d&order=d&limit=1`;
-      const res=await fetch(url,{cache:'no-store'});
-      if(!res.ok)throw new Error('HTTP '+res.status);
-      const data=await res.json();
-      if(data?.error)throw new Error(data.error);
-      const row=Array.isArray(data)?data[0]:null;
-      const price=Number(row?.close ?? row?.adjusted_close);
-      if(!setQuoteOnAsset(a,price,'EODHD'))throw new Error('preço não retornado');
-      a.quoteSymbol=eodSymbol;
-      a.quoteMarketDate=row?.date||null;
-      updated++;
-    }catch(e){
-      // Preserva o último preço válido se a API falhar.
-      failed++;
-      errors.push(`${localTicker} (${eodSymbol}): ${e?.message||'falha na consulta'}`);
-    }
-    await new Promise(r=>setTimeout(r,120));
+
+  const normalized=assets.map(a=>({
+    asset:a,
+    localTicker:String(a.ticker||'')
+      .trim()
+      .toUpperCase()
+      .replace(/\.T$/,'')
+      .replace(/\.TO$/,'')
+      .replace(/\.XTKS$/,'')
+  }));
+
+  const valid=normalized.filter(x=>x.localTicker);
+  const invalid=normalized.filter(x=>!x.localTicker);
+
+  let updated=0;
+  let failed=invalid.length;
+  const errors=invalid.map(()=> 'Ticker japonês vazio');
+
+  if(!valid.length){
+    return{updated,failed,skipped:0,label:`${updated}/${assets.length}`,errors};
   }
+
+  try{
+    const symbols=[...new Set(valid.map(x=>x.localTicker))].join(',');
+    const url=`${JAPAN_WORKER_URL}?symbols=${encodeURIComponent(symbols)}`;
+    const res=await fetch(url,{cache:'no-store'});
+
+    if(!res.ok)throw new Error('HTTP '+res.status);
+
+    const data=await res.json();
+    if(!data?.ok||!data?.results||typeof data.results!=='object'){
+      throw new Error(data?.error||'resposta inválida do Worker');
+    }
+
+    for(const {asset,localTicker} of valid){
+      const row=data.results[localTicker];
+
+      if(row?.ok&&setQuoteOnAsset(asset,row.price,'Yahoo Finance via Worker')){
+        asset.quoteSymbol=row.symbol||`${localTicker}.T`;
+        asset.quoteMarketDate=row.marketTime
+          ? new Date(Number(row.marketTime)*1000).toISOString()
+          : null;
+        updated++;
+      }else{
+        failed++;
+        errors.push(`${localTicker}: ${row?.error||'preço não retornado'}`);
+      }
+    }
+  }catch(e){
+    failed+=valid.length;
+    errors.push(`Worker Japão: ${e?.message||'falha na consulta'}`);
+  }
+
   return{updated,failed,skipped:0,label:`${updated}/${assets.length}`,errors};
 }
 async function refreshAssetQuotes(showAlert=true){
@@ -601,7 +558,7 @@ async function refreshAssetQuotes(showAlert=true){
       msg+=`\nJapão: ${jp.label}`;
 
       if(jp.errors?.length){
-        msg+='\n\nJapão (EODHD):\n'+jp.errors.slice(0,3).join('\n');
+        msg+='\n\nJapão (Worker):\n'+jp.errors.slice(0,3).join('\n');
       }
 
       if(!quoteConfig.alphaKey&&usa.length){
@@ -633,16 +590,9 @@ document.getElementById('importBackupFile').addEventListener('change',e=>{
 });
 document.getElementById('quoteSettingsBtn').addEventListener('click',openQuoteSettings);
 document.getElementById('quoteSettingsBtn2').addEventListener('click',openQuoteSettings);
-document.getElementById('testEodhdTOBtn').addEventListener('click',()=>testEodhdSymbol('8035.TO'));
-document.getElementById('testEodhdXTKSBtn').addEventListener('click',()=>testEodhdSymbol('8035.XTKS'));
-document.getElementById('searchEodhd8035Btn').addEventListener('click',searchEodhd8035);
-document.getElementById('searchEodhd8035TOBtn').addEventListener('click',()=>searchEodhd8035ByExchange('TO'));
-document.getElementById('searchEodhd8035XTKSBtn').addEventListener('click',()=>searchEodhd8035ByExchange('XTKS'));
-document.getElementById('searchAlpha8035Btn').addEventListener('click',searchAlpha8035);
 document.getElementById('saveQuoteSettings').addEventListener('click',()=>{
   quoteConfig.brapiToken=document.getElementById('brapiTokenInput').value.trim();
   quoteConfig.alphaKey=document.getElementById('alphaKeyInput').value.trim();
-  quoteConfig.eodhdToken=document.getElementById('eodhdTokenInput').value.trim();
   saveQuoteConfig();
   document.getElementById('quoteSettingsModal').classList.remove('open');
   alert('Configuração de cotações salva.');
