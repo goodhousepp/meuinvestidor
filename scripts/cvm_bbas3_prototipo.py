@@ -271,7 +271,7 @@ def main():
         if not item.get("ok"):
             failures += 1
         output["resultados"].append(item)
-
+    Path(args.saida).parent.mkdir(parents=True, exist_ok=True)
     Path(args.saida).write_text(
         json.dumps(output, ensure_ascii=False, indent=2),
         encoding="utf-8",
