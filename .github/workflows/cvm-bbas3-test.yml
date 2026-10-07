@@ -1,0 +1,33 @@
+name: Teste CVM BBAS3
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cvm-bbas3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Baixar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Processar DFP CVM 2021-2025
+        run: |
+          python scripts/cvm_bbas3_prototipo.py --inicio 2021 --fim 2025 --saida data/cvm_bbas3_resultado.json
+
+      - name: Publicar resultado para download
+        uses: actions/upload-artifact@v4
+        with:
+          name: cvm-bbas3-resultado
+          path: data/cvm_bbas3_resultado.json
+          if-no-files-found: error
+          retention-days: 7
