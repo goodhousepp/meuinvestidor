@@ -111,7 +111,13 @@ def decimal_pt(value: str) -> Decimal:
     return Decimal(s)
 
 def latest_company_rows(rows: List[dict]) -> List[dict]:
-    rows = [r for r in rows if (r.get("CD_CVM") or "").strip() == CVM_CODE]
+    def same_cvm_code(value: str) -> bool:
+        try:
+            return int((value or "").strip()) == int(CVM_CODE)
+        except (ValueError, TypeError):
+            return False
+
+    rows = [r for r in rows if same_cvm_code(r.get("CD_CVM"))]
     if not rows:
         return []
 
@@ -194,6 +200,17 @@ def process_year(year: int) -> dict:
         dre_rows = latest_company_rows(parse_csv_member(zf, dre_file))
         bpp_rows = latest_company_rows(parse_csv_member(zf, bpp_file))
 
+        if not dre_rows or not bpp_rows:
+            return {
+                "ano": year,
+                "ok": False,
+                "erro": "Banco do Brasil não localizado nas demonstrações pelo CD_CVM.",
+                "dre_file": dre_file,
+                "bpp_file": bpp_file,
+                "dre_rows": len(dre_rows),
+                "bpp_rows": len(bpp_rows),
+            }
+
         profit = select_account(
             dre_rows, NET_INCOME_CODES, year, "DRE", dre_file
         )
@@ -271,6 +288,7 @@ def main():
         if not item.get("ok"):
             failures += 1
         output["resultados"].append(item)
+
     Path(args.saida).parent.mkdir(parents=True, exist_ok=True)
     Path(args.saida).write_text(
         json.dumps(output, ensure_ascii=False, indent=2),
