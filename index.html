@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <meta name="theme-color" content="#1877F2" />
-<title>Meu Investidor v1.39 PWA</title>
+<title>Meu Investidor v1.41 PWA</title>
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" href="icons/icon-192.png" sizes="192x192" />
 <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
@@ -38,6 +38,16 @@
 .dividend-detail-value small{display:block;color:var(--muted);font-weight:600;margin-top:3px}
 
 /* v1.11 — gráfico mensal de dividendos */
+
+.annual-dividend-wrap{overflow-x:auto;padding:4px 0 2px;scrollbar-width:thin}
+.annual-dividend-chart{height:190px;width:max-content;min-width:100%;display:flex;align-items:flex-end;justify-content:center;gap:8px;padding:12px 4px 0;border-bottom:1px solid var(--border)}
+.annual-dividend-col{flex:0 0 64px;width:64px;min-width:64px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;border:0;background:transparent;padding:0;color:inherit}
+.annual-dividend-col.active .annual-dividend-label{color:var(--primary);font-weight:800}
+.annual-dividend-value{font-size:10px;font-weight:700;color:var(--muted);margin-bottom:5px;white-space:nowrap}
+.annual-dividend-bar{width:72%;max-width:38px;min-height:3px;background:linear-gradient(180deg,var(--primary),var(--primary-dark));border-radius:8px 8px 2px 2px}
+.annual-dividend-col.active .annual-dividend-bar{outline:2px solid #bfdbfe;outline-offset:2px}
+.annual-dividend-label{font-size:10px;color:var(--muted);margin-top:6px}
+.annual-dividend-note{font-size:11px;color:var(--muted);margin-top:10px}
 .monthly-dividend-wrap{overflow-x:auto;padding:4px 0 2px;scrollbar-width:thin}
 .monthly-dividend-chart{height:210px;min-width:610px;display:grid;grid-template-columns:repeat(12,minmax(36px,1fr));gap:9px;align-items:end;padding:10px 4px 0;border-bottom:1px solid var(--border)}
 .monthly-dividend-col{height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;min-width:0}
@@ -200,7 +210,7 @@ main,.view,.section,.card,.asset-list{min-width:0;max-width:100%}
 <div class="catalog-search-row" style="margin-top:10px"><div class="note" id="catalogHint">Digite pelo menos 2 caracteres.</div><button class="btn" id="catalogSearchBtn" type="button">Pesquisar</button></div>
 <div id="catalogResults" style="margin-top:12px"><div class="catalog-state">Nenhuma pesquisa realizada.</div></div>
 </div></div></section>
-<section id="incomeView" class="view"><div class="section"><div class="section-head"><h2>Proventos</h2><button class="ghost" data-open="dividendModal">+ Registrar</button></div><div class="card"><div class="goal-row"><div><div class="meta" id="dividendTotalLabel">Total no ano</div><strong id="dividendTotal">¥ 0</strong></div><div><div class="meta">Pagamentos no ano</div><strong id="dividend12">0</strong></div></div></div><div class="card" style="margin-top:10px"><div class="section-head"><h2 style="font-size:16px">Distribuição por ativo <span id="dividendPieYear"></span></h2></div><div class="pie-wrap"><div id="dividendPie" class="pie"></div><div id="dividendLegend" class="legend"></div></div></div><div class="card" style="margin-top:10px"><div class="section-head"><h2 style="font-size:16px">Proventos por mês</h2><select id="dividendMonthlyYear" aria-label="Ano dos proventos" style="width:auto;min-width:92px;padding:8px 10px;border-radius:10px"></select></div><div class="monthly-dividend-wrap"><div id="dividendMonthlyChart" class="monthly-dividend-chart"></div></div><div id="dividendMonthlyTotal" class="monthly-dividend-total"></div></div><div class="card" style="margin-top:10px"><div id="dividendList"></div></div></div></section>
+<section id="incomeView" class="view"><div class="section"><div class="section-head"><h2>Proventos</h2><button class="ghost" data-open="dividendModal">+ Registrar</button></div><div class="card"><div class="goal-row"><div><div class="meta" id="dividendTotalLabel">Total no ano</div><strong id="dividendTotal">¥ 0</strong></div><div><div class="meta">Pagamentos no ano</div><strong id="dividend12">0</strong></div></div></div><div class="card" style="margin-top:10px"><div class="section-head"><h2 style="font-size:16px">Proventos por ano</h2></div><div class="annual-dividend-wrap"><div id="dividendAnnualChart" class="annual-dividend-chart"></div></div><div id="dividendAnnualNote" class="annual-dividend-note">Toque em um ano para visualizar os detalhes.</div></div><div class="card" style="margin-top:10px"><div class="section-head"><h2 style="font-size:16px">Distribuição por ativo <span id="dividendPieYear"></span></h2></div><div class="pie-wrap"><div id="dividendPie" class="pie"></div><div id="dividendLegend" class="legend"></div></div></div><div class="card" style="margin-top:10px"><div class="section-head"><h2 style="font-size:16px">Proventos por mês</h2><select id="dividendMonthlyYear" aria-label="Ano dos proventos" style="width:auto;min-width:92px;padding:8px 10px;border-radius:10px"></select></div><div class="monthly-dividend-wrap"><div id="dividendMonthlyChart" class="monthly-dividend-chart"></div></div><div id="dividendMonthlyTotal" class="monthly-dividend-total"></div></div><div class="card" style="margin-top:10px"><div id="dividendList"></div></div></div></section>
 <section id="goalView" class="view"><div class="section"><div class="section-head"><h2>Projeção de aposentadoria</h2></div><div class="card"><div class="form-grid"><div><label>Meta patrimonial (¥)</label><input id="targetInput" type="number" min="0" step="10000"></div><div><label>Prazo (anos)</label><input id="yearsInput" type="number" min="1" max="60"></div></div><div class="form-grid"><div><label>Aporte anual (¥)</label><input id="annualInput" type="number" min="0" step="10000"></div><div><label>Retorno anual estimado (%)</label><input id="returnInput" type="number" min="-50" max="50" step="0.1"></div></div><button class="btn" id="saveGoal" style="margin-top:14px">Salvar projeção</button></div><div class="card" style="margin-top:10px"><div class="meta">Patrimônio projetado</div><div style="font-size:30px;font-weight:800;margin-top:4px" id="projectedValue">¥ 0</div><div class="meta" style="margin-top:14px">Renda mensal pela regra dos 4%</div><div style="font-size:22px;font-weight:800;margin-top:4px" id="projectedIncome">¥ 0</div><p class="note">A projeção é uma simulação matemática, não uma promessa de rentabilidade.</p></div></div></section>
 </main></div>
 <nav class="bottom"><button class="active" data-view="homeView">⌂<br>Início</button><button data-view="assetsView">◫<br>Carteira</button><button data-view="incomeView">¥<br>Proventos</button><button data-view="goalView">◎<br>Meta</button></nav>
@@ -269,6 +279,17 @@ if(selectedDividendYear===null||!dividendYears.includes(selectedDividendYear))se
 const monthlyYear=selectedDividendYear;
 const yearSelect=document.getElementById('dividendMonthlyYear');
 yearSelect.innerHTML=dividendYears.map(y=>`<option value="${y}"${y===monthlyYear?' selected':''}>${y}</option>`).join('');
+const annualTotals=dividendYears.map(year=>({year,value:divs.filter(d=>d.date&&Number(String(d.date).slice(0,4))===year).reduce((sum,d)=>sum+(d.jpyValue||0),0)})).sort((a,b)=>a.year-b.year);
+const annualMax=Math.max(...annualTotals.map(x=>x.value),0);
+const annualChart=document.getElementById('dividendAnnualChart');
+annualChart.innerHTML=annualTotals.map(x=>{const h=annualMax>0?Math.max(3,Math.round((x.value/annualMax)*130)):3;return `<button type="button" class="annual-dividend-col ${x.year===monthlyYear?'active':''}" data-dividend-year="${x.year}" title="${x.year}: ${jpy(x.value)}"><div class="annual-dividend-value">${x.value?jpy(x.value):''}</div><div class="annual-dividend-bar" style="height:${h}px"></div><div class="annual-dividend-label">${x.year}</div></button>`}).join('');
+const selectedAnnualIndex=annualTotals.findIndex(x=>x.year===monthlyYear);
+const previousAnnual=selectedAnnualIndex>0?annualTotals[selectedAnnualIndex-1]:null;
+const selectedAnnual=annualTotals[selectedAnnualIndex]||null;
+let annualNote='Toque em um ano para visualizar os detalhes.';
+if(selectedAnnual&&previousAnnual&&previousAnnual.value>0){const change=(selectedAnnual.value-previousAnnual.value)/previousAnnual.value*100;const sign=change>=0?'+':'';annualNote=`${monthlyYear}: ${jpy(selectedAnnual.value)} · ${sign}${change.toFixed(1)}% vs. ${previousAnnual.year}`;}else if(selectedAnnual){annualNote=`${monthlyYear}: ${jpy(selectedAnnual.value)}`;}
+document.getElementById('dividendAnnualNote').textContent=annualNote;
+annualChart.querySelectorAll('[data-dividend-year]').forEach(btn=>btn.addEventListener('click',()=>{selectedDividendYear=Number(btn.dataset.dividendYear);render();requestAnimationFrame(()=>{const wrap=document.querySelector('.monthly-dividend-wrap');if(wrap)wrap.scrollLeft=0})}));
 const yearDivs=divs.filter(d=>d.date&&Number(String(d.date).slice(0,4))===monthlyYear);
 const divTotal=yearDivs.reduce((s,d)=>s+(d.jpyValue||0),0);
 document.getElementById('dividendTotalLabel').textContent=`Total em ${monthlyYear}`;
